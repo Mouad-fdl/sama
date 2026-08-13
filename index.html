@@ -1,334 +1,60 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dashboard Emplois & Intelligence IA — Safae Benmoussa</title>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0f172a;
-      color: #f8fafc;
-      min-height: 100vh;
-      padding: 24px;
-    }
-    .container {
-      max-width: 1240px;
-      margin: 0 auto;
-    }
-    .header {
-      background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
-      border: 1px solid #334155;
-      border-radius: 14px;
-      padding: 26px;
-      margin-bottom: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3);
-    }
-    .header-info h1 {
-      font-size: 24px;
-      font-weight: 700;
-      color: #38bdf8;
-      margin-bottom: 6px;
-    }
-    .header-info p {
-      color: #94a3b8;
-      font-size: 13px;
-    }
-    .maintenance-banner {
-      background: rgba(30, 41, 59, 0.8);
-      border: 1px solid #334155;
-      border-radius: 10px;
-      padding: 12px 18px;
-      margin-bottom: 24px;
-      display: flex;
-      gap: 16px;
-      align-items: center;
-      font-size: 12.5px;
-      color: #cbd5e1;
-    }
-    .m-item {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .live-dot {
-      width: 8px;
-      height: 8px;
-      background: #22c55e;
-      border-radius: 50%;
-      box-shadow: 0 0 8px #22c55e;
-    }
-    .stats-badge {
-      background: #2563eb;
-      color: #ffffff;
-      padding: 12px 22px;
-      border-radius: 20px;
-      font-weight: 700;
-      font-size: 15px;
-    }
-    .controls {
-      display: flex;
-      gap: 12px;
-      margin-bottom: 24px;
-      flex-wrap: wrap;
-    }
-    .search-input {
-      flex: 1;
-      min-width: 280px;
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #ffffff;
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-size: 14px;
-      outline: none;
-    }
-    .search-input:focus {
-      border-color: #38bdf8;
-    }
-    .filter-btn {
-      background: #1e293b;
-      border: 1px solid #334155;
-      color: #cbd5e1;
-      padding: 10px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: 500;
-      font-size: 13px;
-      transition: all 0.2s;
-    }
-    .filter-btn.active, .filter-btn:hover {
-      background: #2563eb;
-      color: #ffffff;
-      border-color: #2563eb;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-      gap: 18px;
-    }
-    .card {
-      background: #1e293b;
-      border: 1px solid #334155;
-      border-radius: 12px;
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      transition: transform 0.2s, border-color 0.2s;
-    }
-    .card:hover {
-      transform: translateY(-3px);
-      border-color: #38bdf8;
-    }
-    .card-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-bottom: 10px;
-      gap: 8px;
-    }
-    .card-title {
-      font-size: 15.5px;
-      font-weight: 700;
-      color: #f8fafc;
-      line-height: 1.35;
-    }
-    .match-badge {
-      background: rgba(56, 189, 248, 0.15);
-      color: #38bdf8;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      padding: 4px 10px;
-      border-radius: 6px;
-      font-size: 11.5px;
-      font-weight: 700;
-      white-space: nowrap;
-    }
-    .type-badge {
-      display: inline-block;
-      background: #334155;
-      color: #cbd5e1;
-      padding: 3px 8px;
-      border-radius: 4px;
-      font-size: 10.5px;
-      font-weight: 600;
-      margin-bottom: 8px;
-    }
-    .card-desc {
-      font-size: 12.5px;
-      color: #cbd5e1;
-      margin-bottom: 12px;
-      line-height: 1.45;
-    }
-    .req-title {
-      font-size: 11px;
-      font-weight: 700;
-      color: #38bdf8;
-      text-transform: uppercase;
-      margin-bottom: 6px;
-    }
-    .req-list {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px;
-      margin-bottom: 14px;
-    }
-    .req-tag {
-      background: #0f172a;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      font-size: 10.5px;
-      padding: 3px 7px;
-      border-radius: 4px;
-    }
-    .skills-matched {
-      background: rgba(34, 197, 94, 0.1);
-      border-left: 3px solid #22c55e;
-      padding: 6px 10px;
-      font-size: 11px;
-      color: #86efac;
-      margin-bottom: 14px;
-      border-radius: 0 4px 4px 0;
-    }
-    .card-meta {
-      font-size: 11.5px;
-      color: #94a3b8;
-      margin-bottom: 14px;
-      line-height: 1.4;
-    }
-    .apply-btn {
-      display: block;
-      width: 100%;
-      text-align: center;
-      background: #2563eb;
-      color: #ffffff;
-      text-decoration: none;
-      padding: 11px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 13px;
-      transition: background 0.2s;
-    }
-    .apply-btn:hover {
-      background: #1d4ed8;
-    }
-    .footer {
-      text-align: center;
-      margin-top: 40px;
-      color: #64748b;
-      font-size: 12px;
-    }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="header">
-      <div class="header-info">
-        <h1>🧠 Dashboard Emplois & Agent de Maintenance IA — Safae Benmoussa</h1>
-        <p>Projets Sociaux • Communication & Marketing Digital • Backoffice & Data (Barcelone & Mataró)</p>
-      </div>
-      <div class="stats-badge" id="stats-count">14 Postes Vérifiés</div>
-    </div>
-
-    <div class="maintenance-banner">
-      <div class="m-item"><div class="live-dot"></div> <strong>Agent IA de Maintenance Actif</strong></div>
-      <div class="m-item">🟢 <strong>14 Sites Vérifiés (HTTP 200 OK)</strong></div>
-      <div class="m-item">🧹 <strong>6 Liens Erronés Purgés Automatiquement</strong></div>
-      <div class="m-item">🕒 Mis à jour le 13/08/2026 à 22:18</div>
-    </div>
-
-    <div class="controls">
-      <input type="text" id="searchInput" class="search-input" placeholder="🔍 Rechercher par mot-clé (ex: Canva, Power BI, Mataró, Proyectos)...">
-      <button class="filter-btn active" onclick="filterCategory('ALL')">Tous</button>
-      <button class="filter-btn" onclick="filterCategory('Offre Spécifique')">Offres Directes</button>
-      <button class="filter-btn" onclick="filterCategory('Moteur')">Moteurs Spécialisés</button>
-      <button class="filter-btn" onclick="filterCategory('Candidature Spontanée')">Entreprises Mataró</button>
-    </div>
-
-    <div class="grid" id="jobsGrid"></div>
-
-    <div class="footer">
-      Maintenance & Verification Automatique par IA • Safae Benmoussa (13/08/2026 à 22:18)
-    </div>
-  </div>
-
-  <script>
-    const jobsData = [{"id": "engrunes_pots", "title": "Coordinació i Execució de Projectes Socials", "company": "Grup ENGRUNES / POTS", "category": "Projets Sociaux & Coordination", "location": "Barcelona", "type": "Offre Spécifique Détectée", "url": "https://potstercersector.cat", "source": "POTS Tercer Sector", "description": "Coordination opérationnelle de projets d'insertion sociale, suivi des équipes terrain et accompagnement des initiatives.", "requirements": ["Gestion de projets sociaux", "Animation d'équipe", "Suivi opérationnel", "Sensibilisation communautaire"], "match_score": 90, "matched_skills": ["Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "hacesfalta_com", "title": "Técnica de Comunicación y Campañas (20h)", "company": "ONG Social Barcelona", "category": "Communication & Marketing Digital", "location": "Barcelona", "type": "Offre Spécifique Détectée", "url": "https://hacesfalta.org/oportunidades/ofertas/tecnica-de-comunicacion-y-campanas-20-horas--232049/", "source": "Hacesfalta.org", "description": "Gestion des réseaux sociaux, création de visuels (Canva, IA), mailing et diffusion des projets sociaux.", "requirements": ["Canva & Outils d'IA", "Gestion des réseaux sociaux", "Emailing / Newsletters", "Français & Espagnol"], "match_score": 98, "matched_skills": ["Marketing Digital / Canva / Mail", "Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "hacesfalta_community", "title": "Técnica de Comunicación o Gestor/a de Comunidad", "company": "Fundación Social", "category": "Communication & Animation", "location": "Barcelona", "type": "Offre Spécifique Détectée", "url": "https://hacesfalta.org/oportunidades/ofertas/tecnica-de-comunicacion-o-gestor-a-de-comunidad--231362/", "source": "Hacesfalta.org", "description": "Animation de communauté, création de contenu digital, organisation d'ateliers et relations partenariales.", "requirements": ["Animation de communauté", "Création de contenu visuel", "Organisation d'événements", "Travail en équipe"], "match_score": 98, "matched_skills": ["Marketing Digital / Canva / Mail", "Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "tutreballess", "title": "Tècnic/a d'Acompanyament i Viabilitat de Projectes ESS", "company": "TuTreballESS / Xarxa ESS", "category": "Economía Social & Projets", "location": "Barcelona / Maresme", "type": "Offre Spécifique Détectée", "url": "https://www.tutreballess.cat/", "source": "TuTreballESS", "description": "Assistance technique dans les phases d'idéation et de viabilité économique pour des projets coopératifs et sociaux.", "requirements": ["Master Innovation Sociale (UAB)", "Idéation & Faisabilité", "Accompagnement d'entreprises sociales", "Backoffice"], "match_score": 98, "matched_skills": ["Barcelone / Maresme", "Master UAB / Innovation Sociale", "Coordination Projets / Backoffice"]}, {"id": "coopmaresme", "title": "Coopmaresme — Ateneu Cooperatiu del Maresme", "company": "Coopmaresme", "category": "Écosystème ESS Mataró", "location": "Mataró", "type": "Candidature Spontanée / Projets", "url": "https://coopmaresme.cat/", "source": "Site Officiel", "description": "Portail officiel de Coopmaresme. Recrutements et opportunités d'accompagnement de projets coopératifs à Mataró.", "requirements": ["Accompagnement projets ESS", "Benchmarking", "Communication & Mailing", "Mataró / Maresme"], "match_score": 98, "matched_skills": ["Marketing Digital / Canva / Mail", "Barcelone / Maresme", "Data Analysis / Power BI / Excel"]}, {"id": "cfp_maresme", "title": "CFP Maresme — Centre de Formació i Prevenció", "company": "CFP Maresme", "category": "Projets Communautaires", "location": "Mataró", "type": "Candidature Spontanée", "url": "https://cfp.cat/", "source": "Site Officiel", "description": "Entité majeure d'insertion et d'action communautaire à Mataró. Postes en coordination et communication.", "requirements": ["Action communautaire", "Support technique", "Animation d'ateliers", "Sensibilisation"], "match_score": 80, "matched_skills": ["Barcelone / Maresme"]}, {"id": "bloc4", "title": "Bloc 4 (Can Batlló) — Hub Innovation Sociale", "company": "Bloc 4 Barcelona", "category": "Hub Innovation Sociale", "location": "Barcelona", "type": "Candidature Spontanée", "url": "https://bloc4.coop/", "source": "Site Officiel", "description": "Le grand centre d'innovation socio-économique et coopérative de Barcelone.", "requirements": ["Entrepreneuriat social", "Innovation coopérative", "Événementiel & Logistique", "Réseaux d'acteurs"], "match_score": 98, "matched_skills": ["Barcelone / Maresme", "Master UAB / Innovation Sociale", "Coordination Projets / Backoffice"]}, {"id": "linkedin_proyectos", "title": "LinkedIn Jobs — Técnico/a de Proyectos Sociales", "company": "Moteur LinkedIn", "category": "Projets Sociaux", "location": "Barcelona", "type": "Moteur d'Offres Directes", "url": "https://www.linkedin.com/jobs/search/?keywords=tecnico%20proyectos%20sociales&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour toutes les offres de techniciens de projets sociaux à Barcelone.", "requirements": ["Gestion de projets", "Secteur social", "Barcelone", "Français / Espagnol"], "match_score": 98, "matched_skills": ["Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "linkedin_com", "title": "LinkedIn Jobs — Técnico/a de Comunicación y Marketing", "company": "Moteur LinkedIn", "category": "Communication", "location": "Barcelona", "type": "Moteur d'Offres Directes", "url": "https://www.linkedin.com/jobs/search/?keywords=comunicacion%20marketing%20social&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour les offres de communication, Canva, et marketing digital à Barcelone.", "requirements": ["Marketing digital", "Canva & Visuels", "Social Media", "Barcelone"], "match_score": 90, "matched_skills": ["Marketing Digital / Canva / Mail", "Barcelone / Maresme"]}, {"id": "linkedin_ess", "title": "LinkedIn Jobs — Economía Social & Cooperativas", "company": "Moteur LinkedIn", "category": "Economía Social", "location": "Barcelona", "type": "Moteur d'Offres Directes", "url": "https://www.linkedin.com/jobs/search/?keywords=economia%20social&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour toutes les offres du secteur coopératif et de l'innovation sociale.", "requirements": ["Innovation sociale", "Cooperatives / ESS", "Gestion d'initiatives", "Barcelone"], "match_score": 90, "matched_skills": ["Barcelone / Maresme", "Master UAB / Innovation Sociale"]}, {"id": "tutreballess_hub", "title": "Tu TreballESS — Portail Emploi N°1 Économie Sociale", "company": "Ajuntament de Barcelona", "category": "Hub ESS", "location": "Barcelona", "type": "Portail Spécialisé ESS", "url": "https://www.tutreballess.cat/", "source": "TuTreballESS", "description": "Portail officiel regroupant les offres d'emploi des coopératives, associations et fondations de Barcelone.", "requirements": ["Portail officiel ESS", "Multidisciplinaire", "Tercer Sector", "Barcelone"], "match_score": 98, "matched_skills": ["Barcelone / Maresme", "Master UAB / Innovation Sociale"]}, {"id": "pots_hub", "title": "POTS Tercer Sector — Emploi Social en Catalogne", "company": "La Confederació / Taula Tercer Sector", "category": "Tercer Sector", "location": "Barcelona / Catalogne", "type": "Portail Spécialisé Social", "url": "https://potstercersector.cat", "source": "POTS", "description": "Bourse d'emploi officielle de la Taula del Tercer Sector pour les postes de gestion de projets et communication.", "requirements": ["Tercer Sector Social", "Coordinació de projectes", "Comunicació", "Catalogne"], "match_score": 90, "matched_skills": ["Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "hacesfalta_hub", "title": "Hacesfalta.org — Offres Emploi ONG Barcelone", "company": "Fundación Botín / Hacesfalta", "category": "ONG / Social", "location": "Barcelona", "type": "Portail Spécialisé ONG", "url": "https://www.hacesfalta.org/oportunidades/ofertas/buscador?txtBusqueda=proyectos&idProvincia=8", "source": "Hacesfalta", "description": "Moteur de recherche pour les postes de techniciens de projets et communication dans les ONG à Barcelone.", "requirements": ["ONG & Fondations", "Proyectos sociales", "Comunicación", "Barcelone"], "match_score": 98, "matched_skills": ["Marketing Digital / Canva / Mail", "Barcelone / Maresme", "Coordination Projets / Backoffice"]}, {"id": "infojobs_hub", "title": "InfoJobs — Técnico de Proyectos (Barcelona)", "company": "InfoJobs", "category": "Projets", "location": "Barcelona", "type": "Moteur Généraliste", "url": "https://www.infojobs.net/ofertas-trabajo/tecnico-proyectos/barcelona", "source": "InfoJobs", "description": "Offres d'emploi recensées sur InfoJobs pour les techniciens de projets à Barcelone.", "requirements": ["Técnico de proyectos", "Barcelone"], "match_score": 98, "matched_skills": ["Barcelone / Maresme", "Coordination Projets / Backoffice"]}];
-    let currentFilter = 'ALL';
-
-    function renderJobs() {
-      const grid = document.getElementById('jobsGrid');
-      const searchVal = document.getElementById('searchInput').value.toLowerCase();
-      grid.innerHTML = '';
-
-      let count = 0;
-      jobsData.forEach(job => {
-        const matchesCategory = (currentFilter === 'ALL') || 
-                                (job.type.toLowerCase().includes(currentFilter.toLowerCase())) ||
-                                (job.category.toLowerCase().includes(currentFilter.toLowerCase()));
-        const matchesSearch = job.title.toLowerCase().includes(searchVal) || 
-                              job.category.toLowerCase().includes(searchVal) ||
-                              job.description.toLowerCase().includes(searchVal) ||
-                              (job.requirements && job.requirements.join(' ').toLowerCase().includes(searchVal)) ||
-                              job.source.toLowerCase().includes(searchVal);
-
-        if (matchesCategory && matchesSearch) {
-          count++;
-          const card = document.createElement('div');
-          card.className = 'card';
-          
-          let reqHtml = '';
-          if (job.requirements && job.requirements.length > 0) {
-            reqHtml = `<div class="req-title">💡 Requis & Compétences Clés :</div><div class="req-list">` +
-                      job.requirements.map(r => `<span class="req-tag">${r}</span>`).join('') +
-                      `</div>`;
-          }
-
-          let skillsHtml = '';
-          if (job.matched_skills && job.matched_skills.length > 0) {
-            skillsHtml = `<div class="skills-matched">✓ Match Profil : ${job.matched_skills.join(' • ')}</div>`;
-          }
-
-          card.innerHTML = `
-            <div>
-              <div class="type-badge">${job.type}</div>
-              <div class="card-top">
-                <div class="card-title">${job.title}</div>
-                <div class="match-badge">${job.match_score}% Match</div>
-              </div>
-              <div class="card-desc">${job.description}</div>
-              ${reqHtml}
-              ${skillsHtml}
-              <div class="card-meta">
-                📍 ${job.location} • 🏷️ ${job.category}<br>
-                📡 Source Officielle: ${job.source}
-              </div>
-            </div>
-            <div class="card-action">
-              <a href="${job.url}" target="_blank" class="apply-btn">🚀 Voir le Poste / Postuler Directement</a>
-            </div>
-          `;
-          grid.appendChild(card);
-        }
-      });
-
-      document.getElementById('stats-count').innerText = `${count} Postes Vérifiés`;
-    }
-
-    function filterCategory(cat) {
-      currentFilter = cat;
-      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
-      event.target.classList.add('active');
-      renderJobs();
-    }
-
-    document.getElementById('searchInput').addEventListener('input', renderJobs);
-    renderJobs();
-  </script>
-</body>
-</html>
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+===================================================================
+  BOT DE MAINTENANCE AUTO-INTELLIGENTE & IA CONSEILS STRATÉGIQUES
+  BOT DE MAINTENANCE AUTO-INTELLIGENTE & FOCUS MATARÓ / MARESME
+  Candidat: SAFAE BENMOUSSA
+===================================================================
+  Fonctionnalités Clés :
+  1. Maintenance Self-Healing HTTP 200 (Purge auto des liens 404).
+  2. Deep NLP & Match Sémantique par IA.
+  3. Générateur de Conseils Stratégiques Personnalisés par IA sur chaque carte !
+  1. Spécialisation Mataró & Comarca del Maresme (Portails Municipaux & Socials).
+  2. Maintenance Self-Healing HTTP 200 (Purge auto des liens 404).
+  3. Deep NLP Matcher + Conseils Stratégiques IA Personnalisés.
+===================================================================
+"""
+CANDIDATE_NAME = "Safae Benmoussa"
+CANDIDATE_PROFILE_SUMMARY = "Master en Innovation Sociale (UAB), Licence Économie & Gestion. Expérience Coopmaresme (Backoffice, Com, Benchmarking). Trilingue FR/ES/AR + Català."
+# Portails & Offres ciblées avec Conseils Stratégiques IA
+# Portails & Offres ciblées avec Focus Mataró & Maresme
+TARGET_SOURCES = [
+    # 📍 SECTION SPÉCIALE MATARÓ & MARESME
+    {
+        "id": "mataro_som",
+        "title": "SOM Mataró — Borsa de Treball Servei d'Ocupació de Mataró",
+        "company": "Ajuntament de Mataró",
+        "category": "Portail Municipal Mataró",
+        "location": "Mataró",
+        "type": "Emploi Local Mataró",
+        "url": "https://www.mataro.cat/ca/ocupacio/persones/treball/borsa-de-treball/ofertes-de-feina",
+        "source": "Ajuntament de Mataró",
+        "description": "Portail officiel de l'emploi de la Mairie de Mataró recensant les offres du secteur social, administratif et communication.",
+        "requirements": ["Borsa de treball municipal", "Servicis socials", "Administració local", "Mataró"],
+        "ai_advice": "Inscrivez-vous directement sur le portail SOM Mataró (Carrer de Francisco Herrera, 70) pour figurer sur la borsa de treball municipale."
+    },
+    {
+        "id": "mataro_public",
+        "title": "Oferta d'Ocupació Pública — Ajuntament de Mataró",
+        "company": "Ajuntament de Mataró",
+        "category": "Secteur Public Mataró",
+        "location": "Mataró",
+        "type": "Emploi Local Mataró",
+        "url": "https://www.mataro.cat/ca/lajuntament/oferta-docupacio-publica",
+        "source": "Ajuntament de Mataró",
+        "description": "Convocations et bourses de travail publiques ouvertes pour les techniciens de projets et la gestion administrative à Mataró.",
+        "requirements": ["Convocatòries públiques", "Gestió de projectes", "Administració pública", "Mataró"],
+        "ai_advice": "Consultez les convocations de 'Borses de treball temporals' en gestion sociale ou communication."
+    },
+    {
+        "id": "coopmaresme",
+        "title": "Coopmaresme — Ateneu Cooperatiu del Maresme",
+        "company": "Coopmaresme",
+        "category": "Écosystème ESS Mataró",
+        "location": "Mataró",
+        "type": "Emploi Local Mataró",
+        "url": "https://coopmaresme.cat/",
+        "source": "Site Officiel",
+        "description": "Portail officiel de Coopmaresme à Mataró. Opportunités directes d'accompagnement de projets coopératifs et communication.",
+        "requirements": ["Accompagnement projets ESS", "Benchmarking", "Communication & Mailing", "Mataró / Maresme"],
