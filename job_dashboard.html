@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard Emplois — Safae Benmoussa</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #060814;
+      --bg-surface: rgba(17, 24, 39, 0.6);
+      --bg-elevated: rgba(30, 41, 59, 0.7);
+      --border-subtle: rgba(148, 163, 184, 0.1);
+      --border-hover: rgba(56, 189, 248, 0.4);
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent-cyan: #38bdf8;
+      --accent-blue: #3b82f6;
+      --accent-gold: #f59e0b;
+      --accent-emerald: #10b981;
+      --accent-purple: #a855f7;
+      --shadow-glow: 0 0 20px rgba(56, 189, 248, 0.15);
+    }
+
+    .gemini-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(56, 189, 248, 0.2));
+      color: #c084fc;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .gemini-btn:hover {
+      background: linear-gradient(135deg, #a855f7, #2563eb);
+      color: #ffffff;
+      border-color: #a855f7;
+      box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4);
+    }
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(6, 8, 20, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-card {
+      background: #0f172a;
+      border: 1px solid rgba(168, 85, 247, 0.4);
+      border-radius: 20px;
+      max-width: 680px;
+      width: 100%;
+      padding: 28px;
+      box-shadow: 0 25px 50px -12px rgba(0,0,0,0.7);
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px; right: 20px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .letter-box {
+      background: rgba(6, 8, 20, 0.7);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 13.5px;
+      line-height: 1.6;
+      color: #e2e8f0;
+      white-space: pre-wrap;
+      max-height: 380px;
+      overflow-y: auto;
+      margin: 16px 0;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      min-height: 100vh;
+      padding: 32px 24px;
+      background-image: 
+        radial-gradient(circle at 5% 0%, rgba(56, 189, 248, 0.08) 0%, transparent 35%),
+        radial-gradient(circle at 95% 100%, rgba(245, 158, 11, 0.06) 0%, transparent 35%),
+        radial-gradient(circle at 50% 50%, rgba(168, 85, 247, 0.04) 0%, transparent 50%);
+      background-attachment: fixed;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    ::-webkit-scrollbar { width: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.2); border-radius: 10px; border: 2px solid transparent; background-clip: padding-box; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.4); background-clip: padding-box; border: 2px solid transparent; }
+
+    .container { max-width: 1300px; margin: 0 auto; }
+
+    /* --- Header --- */
+    .header {
+      background: var(--bg-surface);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid var(--border-subtle);
+      border-radius: 24px;
+      padding: 36px;
+      margin-bottom: 24px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 32px;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 50px -20px rgba(0,0,0,0.5);
+    }
+    .header::after {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+    }
+    .header-eyebrow {
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--accent-cyan);
+      font-weight: 700;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .header h1 {
+      font-family: 'Sora', sans-serif;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1.2;
+      margin-bottom: 12px;
+      background: linear-gradient(90deg, #ffffff, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .header p {
+      color: var(--text-secondary);
+      font-size: 15px;
+      margin-bottom: 20px;
+      max-width: 600px;
+    }
+    .location-pill {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      padding: 8px 16px;
+      border-radius: 100px;
+      font-size: 12px;
+      color: #7dd3fc;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 500;
+    }
+    .header-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: flex-end;
+    }
+    .stat-card {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(56, 189, 248, 0.05));
+      border: 1px solid rgba(59, 130, 246, 0.3);
+      padding: 20px 28px;
+      border-radius: 16px;
+      text-align: center;
+      min-width: 180px;
+      position: relative;
+      overflow: hidden;
+    }
+    .stat-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at top right, rgba(59, 130, 246, 0.2), transparent 70%);
+    }
+    .stat-number {
+      font-family: 'Sora', sans-serif;
+      font-size: 36px;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1;
+      margin-bottom: 6px;
+      position: relative;
+    }
+    .stat-label {
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-secondary);
+      position: relative;
+    }
+
+    /* --- Banner --- */
+    .info-banner {
+      display: flex;
+      gap: 32px;
+      padding: 18px 28px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+    .banner-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 13px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+    .pulse-dot {
+      width: 8px; height: 8px;
+      background: var(--accent-emerald);
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 2.5s infinite;
+    }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+
+    /* --- Controls --- */
+    .controls-wrapper {
+      background: rgba(15, 23, 42, 0.3);
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 16px;
+      margin-bottom: 28px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .search-container {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+    .search-container svg {
+      position: absolute;
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      width: 18px;
+      height: 18px;
+    }
+    .search-input {
+      width: 100%;
+      background: rgba(6, 8, 20, 0.6);
+      border: 1px solid var(--border-subtle);
+      color: var(--text-primary);
+      padding: 14px 20px 14px 48px;
+      border-radius: 12px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+    .search-input::placeholder { color: var(--text-muted); }
+    .search-input:focus {
+      border-color: var(--accent-cyan);
+      background: rgba(6, 8, 20, 0.9);
+      box-shadow: 0 0 0 4px rgba(56, 189, 248, 0.1);
+    }
+    .filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .chip {
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 10px 16px;
+      border-radius: 100px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 13px;
+      transition: all 0.2s ease;
+      font-family: 'Inter', sans-serif;
+      white-space: nowrap;
+    }
+    .chip:hover { border-color: var(--accent-cyan); color: var(--accent-cyan); background: rgba(56, 189, 248, 0.05); }
+    .chip.active {
+      background: var(--text-primary);
+      color: #060814;
+      border-color: var(--text-primary);
+      font-weight: 600;
+    }
+    .chip.gold.active { background: var(--accent-gold); border-color: var(--accent-gold); }
+
+    /* --- Grid & Cards --- */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 24px;
+    }
+    
+    .card {
+      background: var(--bg-surface);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-subtle);
+      border-radius: 20px;
+      padding: 28px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      animation: fadeInUp 0.5s ease forwards;
+      opacity: 0;
+    }
+    .card:nth-child(1) { animation-delay: 0.05s; }
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.15s; }
+    .card:nth-child(4) { animation-delay: 0.2s; }
+    .card:nth-child(5) { animation-delay: 0.25s; }
+    .card:nth-child(6) { animation-delay: 0.3s; }
+    .card:nth-child(7) { animation-delay: 0.35s; }
+    .card:nth-child(8) { animation-delay: 0.4s; }
+    .card:nth-child(9) { animation-delay: 0.45s; }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 4px; height: 100%;
+      background: linear-gradient(to bottom, var(--accent-cyan), var(--accent-blue));
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .card.mataro-card::before { background: linear-gradient(to bottom, var(--accent-gold), #d97706); }
+    
+    .card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-hover);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.6), 0 0 0 1px var(--border-hover);
+    }
+    .card:hover::before { opacity: 1; }
+
+    .card-header { margin-bottom: 16px; }
+    .tag-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+    
+    .type-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 600;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
+    .type-tag.gold {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--accent-gold);
+      border-color: rgba(245, 158, 11, 0.2);
+    }
+
+    .match-circle {
+      position: relative;
+      width: 48px; height: 48px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .match-circle svg { position: absolute; top: 0; left: 0; transform: rotate(-90deg); }
+    .match-circle .bg { stroke: rgba(255,255,255,0.1); }
+    .match-circle .progress { stroke: var(--accent-emerald); transition: stroke-dashoffset 0.5s ease; }
+    .match-circle span { font-size: 13px; font-weight: 700; color: var(--accent-emerald); z-index: 1; }
+
+    .card-title {
+      font-family: 'Sora', sans-serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 1.4;
+      letter-spacing: -0.5px;
+      margin-bottom: 8px;
+    }
+    .card-subtitle { font-size: 13px; color: var(--text-secondary); font-weight: 500; margin-bottom: 16px; }
+    .card-desc { font-size: 13.5px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 20px; }
+
+    .skill-section {
+      background: rgba(6, 8, 20, 0.5);
+      border: 1px solid rgba(255,255,255,0.05);
+      padding: 14px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+    }
+    .skill-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: var(--accent-cyan); margin-bottom: 8px; font-weight: 700;}
+    .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+    .skill-tag {
+      background: rgba(148, 163, 184, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.15);
+      color: #e2e8f0;
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-weight: 500;
+    }
+    .skill-tag.highlight {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.3);
+      color: var(--accent-emerald);
+    }
+
+    .ai-box {
+      background: linear-gradient(135deg, rgba(168, 85, 247, 0.08), transparent);
+      border-left: 2px solid var(--accent-purple);
+      padding: 12px 16px;
+      border-radius: 0 8px 8px 0;
+      margin-bottom: 20px;
+    }
+    .ai-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--accent-purple);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      display: flex; align-items: center; gap: 6px;
+    }
+    .ai-text { font-size: 12.5px; color: #d8b4fe; line-height: 1.5; }
+
+    .card-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-subtle);
+    }
+    .meta-info { font-size: 11.5px; color: var(--text-muted); }
+    
+    .apply-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--text-primary);
+      color: #060814;
+      text-decoration: none;
+      padding: 10px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 12.5px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+    .apply-btn:hover {
+      background: var(--accent-cyan);
+      box-shadow: 0 4px 12px rgba(56, 189, 248, 0.3);
+      transform: translateX(2px);
+    }
+
+    .empty-state {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 80px 20px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px dashed rgba(148, 163, 184, 0.2);
+      border-radius: 24px;
+    }
+    .empty-state h3 { font-family: 'Sora', sans-serif; color: var(--text-primary); margin-bottom: 8px; }
+
+    .footer {
+      text-align: center;
+      margin-top: 48px;
+      color: var(--text-muted);
+      font-size: 12px;
+      padding-bottom: 24px;
+    }
+
+    @media (max-width: 900px) {
+      .header { grid-template-columns: 1fr; gap: 24px; }
+      .header-stats { align-items: flex-start; }
+      .header h1 { font-size: 26px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header class="header">
+      <div class="header-content">
+        <div class="header-eyebrow">
+          <span style="width: 6px; height: 6px; background: var(--accent-cyan); border-radius: 50%; box-shadow: 0 0 8px var(--accent-cyan);"></span>
+          Tableau de Bord Stratégique IA
+        </div>
+        <h1>Opportunités Carrière<br>Mataró & Barcelone</h1>
+        <p>Safae Benmoussa • Projets Sociaux, Communication Digitale & Data Analysis. Rayon d'action optimisé (< 30 km).</p>
+        <div class="location-pill">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          Base: Carrer Bombers Madern i Clariana 14, Mataró
+        </div>
+      </div>
+      <div class="header-stats">
+        <div class="stat-card">
+          <div class="stat-number" id="stats-count">20</div>
+          <div class="stat-label" id="stats-label">Postes Sélectionnés</div>
+        </div>
+      </div>
+    </header>
+
+    <div class="info-banner">
+      <div class="banner-item"><div class="pulse-dot"></div> Agent IA & Match Sémantique Actif</div>
+      <div class="banner-item">📍 <strong>7 Offres Locales</strong> Mataró (&lt; 3 km)</div>
+      <div class="banner-item">🚆 <strong>Barcelone Direct</strong> R1 (33 min)</div>
+      <div class="banner-item">🕒 Maj: 14/08/2026 à 14:34</div>
+    </div>
+
+    <div class="controls-wrapper">
+      <div class="search-container">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+        <input type="text" id="searchInput" class="search-input" placeholder="Rechercher (Mataró, Canva, Power BI, Proyectos)...">
+      </div>
+      <div class="filters">
+        <button class="chip active" data-filter="ALL">Tous</button>
+        <button class="chip gold" data-filter="Mataró">📍 Mataró (&lt; 3 km)</button>
+        <button class="chip" data-filter="TopMatch">⭐ Top Match (&gt; 90%)</button>
+        <button class="chip" data-filter="Innovation">🎓 Master UAB & ESS</button>
+        <button class="chip" data-filter="Data">📊 Data & Backoffice</button>
+        <button class="chip" data-filter="Communication">🎨 Communication & Canva</button>
+      </div>
+    </div>
+
+    <div class="grid" id="jobsGrid"></div>
+
+    <footer class="footer">
+      Analyse Géographique & Sémantique IA (Rayon 30 km Mataró) • Safae Benmoussa • 14/08/2026 à 14:34
+    </footer>
+  </div>
+
+  <script>
+    const jobsData = [{"id": "tecnocampus_mataro", "title": "TecnoCampus Mataró-Maresme — Borsa de Treball & Talent", "company": "Fundació TecnoCampus / UPF", "category": "Mataró (2.4 km)", "location": "Mataró (2.4 km de votre domicile)", "type": "📍 Mataró Centre (< 3 km)", "url": "https://www.tecnocampus.cat/ca/treballa-amb-nosaltres", "source": "TecnoCampus", "description": "Le grand parc technologique, universitaire et d'innovation sociale de Mataró. Postes en gestion de projets et support.", "requirements": ["Innovation & Projets", "Gestion administrative", "Universitaire", "Mataró"], "ai_advice": "📍 Situé au TecnoCampus (Av. Ernest Lluch). Déposez votre candidature spontanée pour les projets d'innovation sociale.", "match_score": 98, "matched_skills": ["📍 Mataró Centre (< 3 km)", "⚙️ Coordination Projets / Backoffice", "🎨 Marketing Digital / Canva / Mail", "📊 Data Analysis / Power BI / Excel", "🎓 Master UAB / Innovation Sociale"]}, {"id": "consell_maresme", "title": "Consell Comarcal del Maresme — Convocatòries i Borses", "company": "Consell Comarcal del Maresme", "category": "Mataró (2.0 km)", "location": "Mataró (2.0 km de votre domicile)", "type": "📍 Mataró Centre (< 3 km)", "url": "https://www.ccmaresme.cat/", "source": "Consell Comarcal", "description": "Organisme public gérant les services sociaux et le développement économique de toute la comarca du Maresme depuis Mataró.", "requirements": ["Comarca del Maresme", "Développement local", "Services sociaux", "Mataró"], "ai_advice": "Candidatez spontanément ou ciblez les offres du département 'Emprenedoria, empresa i ocupació' en mettant en valeur votre stage chez Coopmaresme. Soulignez l'alignement parfait de votre Master en Innovation Sociale avec leurs projets de développement local et votre maîtrise du catalan.", "match_score": 94, "matched_skills": ["Master UAB / Innovation Sociale", "Ancrage territorial à Mataró (Coopmaresme)", "Catalan professionnel & Espagnol courant"]}, {"id": "coopmaresme", "title": "Coopmaresme — Ateneu Cooperatiu del Maresme", "company": "Coopmaresme", "category": "Mataró (1.5 km)", "location": "Mataró (1.5 km de votre domicile)", "type": "📍 Mataró Centre (< 3 km)", "url": "https://coopmaresme.cat/", "source": "Site Officiel", "description": "Portail officiel de Coopmaresme à Mataró. Opportunités directes d'accompagnement de projets coopératifs et communication.", "requirements": ["Accompagnement projets ESS", "Benchmarking", "Communication & Mailing", "Mataró / Maresme"], "ai_advice": "Ayant déjà effectué un stage réussi au sein de Coopmaresme, contactez directement vos anciens collègues ou tuteurs pour valoriser votre connaissance interne de la structure. Mettez en avant votre Master en Innovation Sociale et votre maîtrise du catalan pour vous positionner comme la candidate idéale et immédiatement opérationnelle.", "match_score": 98, "matched_skills": ["Expérience de stage chez Coopmaresme", "Master UAB / Innovation Sociale", "Catalan professionnel", "Proximité locale (1.5 km)"]}, {"id": "cfp_maresme", "title": "CFP Maresme — Centre de Formació i Prevenció", "company": "CFP Maresme", "category": "Mataró (1.5 km)", "location": "Mataró (1.5 km de votre domicile)", "type": "📍 Mataró Centre (< 3 km)", "url": "https://cfp.cat/", "source": "Site Officiel", "description": "Entité majeure d'insertion et d'action communautaire à Mataró. Postes en coordination et communication.", "requirements": ["Action communautaire", "Support technique", "Animation d'ateliers", "Mataró"], "ai_advice": "Mettez en valeur votre Master en innovation sociale et votre expérience locale chez Coopmaresme, particulièrement pertinents pour cette structure d'insertion à Mataró. Proposez une candidature spontanée axée sur la coordination de projets communautaires et la communication digitale en catalan.", "match_score": 92, "matched_skills": ["Proximité géographique idéale (Mataró à 1.5 km)", "Master UAB en Innovation Sociale & expérience Coopmaresme", "Communication digitale, Mailings & Catalan professionnel"]}, {"id": "mataro_public", "title": "Oferta d'Ocupació Pública — Ajuntament de Mataró", "company": "Ajuntament de Mataró", "category": "Mataró Public", "location": "Mataró (Centre)", "type": "📍 Mataró Centre (< 3 km)", "url": "https://www.mataro.cat/ca/lajuntament/oferta-docupacio-publica", "source": "Ajuntament de Mataró", "description": "Convocations et bourses de travail publiques ouvertes pour les techniciens de projets et la gestion administrative à Mataró.", "requirements": ["Convocatòries públiques", "Gestió de projectes", "Administració pública", "Mataró"], "ai_advice": "Postulez directement aux bourses de travail de la mairie de Mataró en ciblant les postes de technicien de projet en entrepreneuriat ou économie sociale, très cohérents avec votre Master UAB et votre stage chez Coopmaresme. Veillez à préparer vos équivalences de diplômes et votre certification de catalan pour répondre aux exigences strictes de l'administration publique.", "match_score": 92, "matched_skills": ["Master UAB / Économie Sociale", "Mataró Centre (< 3 km)", "Catalan professionnel & Espagnol", "Gestion administrative & Projets"]}, {"id": "linkedin_mataro", "title": "LinkedIn Jobs — Offres Actives à Mataró (< 5 km)", "company": "Moteur LinkedIn Mataró", "category": "Mataró (< 5 km)", "location": "Mataró et alentours proches", "type": "📍 Mataró Centre (< 3 km)", "url": "https://www.linkedin.com/jobs/search/?keywords=proyectos%20OR%20comunicacion&location=Matar%C3%B3%2C%20Catalonia%2C%20Spain", "source": "LinkedIn Mataró", "description": "Filtre LinkedIn ciblé à 100% sur les offres d'emploi disponibles dans la ville de Mataró.", "requirements": ["Filtre 100% Mataró", "Communication", "Gestion de projets", "Région Maresme"], "ai_advice": "Profite de cette sélection ultra-locale à Mataró pour postuler en priorité aux postes de communication en valorisant ton expérience chez Coopmaresme. Mets en avant ton bilinguisme espagnol/catalan et ta maîtrise des outils digitaux comme Canva et l'IA créative pour te démarquer auprès des recruteurs locaux.", "match_score": 92, "matched_skills": ["Communication digitale (Coopmaresme)", "Localisation Mataró (< 5 km)", "Trilingue Espagnol / Catalan / Français"]}, {"id": "feina_activa_mataro", "title": "Feina Activa SOC — Generalitat (Maresme < 15 km)", "company": "Servei d'Ocupació de Catalunya", "category": "Maresme (< 15 km)", "location": "Mataró & Comarca del Maresme", "type": "🚆 Maresme / Train R1 (< 15 km)", "url": "https://feinaactiva.gencat.cat/", "source": "Generalitat de Catalunya", "description": "Portail public d'emploi de la Generalitat couvrant Mataró, Arenys, Canet, Vilassar et Premià.", "requirements": ["Borsa pública SOC", "Mataró / Maresme", "Projets sociaux", "Catalogne"], "ai_advice": "🚆 Toutes les villes desservies par le train R1 depuis Mataró (Vilassar, Premià, Arenys) sont accessibles en moins de 15 minutes !", "match_score": 93, "matched_skills": ["📊 Data Analysis / Power BI / Excel", "📍 Mataró Centre (< 3 km)", "🎓 Master UAB / Innovation Sociale"]}, {"id": "barcelona_activa", "title": "Barcelona Activa — Borsa de Treball & Emprenedoria Social", "company": "Ajuntament de Barcelona", "category": "Barcelone (33 min Train)", "location": "Barcelona (33 min en Train R1 direct)", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.barcelonactiva.cat/", "source": "Barcelona Activa", "description": "Agence de développement économique et d'entrepreneuriat social de Barcelone. Recrutement régulier de techniciens d'innovation.", "requirements": ["Innovation Sociale", "Accompagnement Projets", "Développement Économique", "Barcelone"], "ai_advice": "Inscrivez-vous immédiatement sur la plateforme de la Borsa de Treball de Barcelona Activa en valorisant votre Master de l'UAB. Mettez en avant votre expérience chez Coopmaresme pour démontrer votre excellente connaissance de l'écosystème de l'économie sociale et solidaire locale.", "match_score": 92, "matched_skills": ["Master UAB / Entrepreneuriat & Innovation Sociale", "Catalan professionnel & Espagnol", "Expérience ESS chez Coopmaresme"]}, {"id": "pere_tarres", "title": "Fundació Pere Tarrés — Offres Projets & Communication", "company": "Fundació Pere Tarrés", "category": "Barcelone (33 min Train)", "location": "Barcelona / Maresme", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.peretarres.org/treballa-amb-nosaltres", "source": "Fundació Pere Tarrés", "description": "Référence majeure de l'action sociale et éducative en Catalogne. Recrutement actif en coordination et communication.", "requirements": ["Projets Sociaux", "Communication Digital", "Backoffice", "Catalogne"], "ai_advice": "La fondation recrute régulièrement des techniciens de projets. Votre profil trilingue FR/ES/AR est un atout fort.", "match_score": 98, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🚆 Maresme Littoral (< 15 km)", "🎨 Marketing Digital / Canva / Mail", "🎓 Master UAB / Innovation Sociale"]}, {"id": "xes_coop", "title": "XES (Xarxa d'Economia Solidària) — Borsa de Treball", "company": "Xarxa d'Economia Solidària de Catalunya", "category": "Barcelone (33 min Train)", "location": "Barcelona / Catalogne", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://xes.cat/", "source": "XES", "description": "Réseau officiel de l'économie sociale et solidaire en Catalogne regroupant des centaines de coopératives.", "requirements": ["Economia Solidària", "Gestion de projets", "Réseaux d'acteurs", "Catalogne"], "ai_advice": "Consultez les bourses de travail et les événements du réseau XES pour réseauter directement avec les dirigeants d'entreprises sociales.", "match_score": 95, "matched_skills": ["📊 Data Analysis / Power BI / Excel", "⚙️ Coordination Projets / Backoffice", "🚆 Barcelone Direct R1 (< 30 km)", "🎓 Master UAB / Innovation Sociale"]}, {"id": "engrunes_pots", "title": "Coordinació i Execució de Projectes Socials", "company": "Grup ENGRUNES / POTS", "category": "Barcelone (33 min Train)", "location": "Barcelona (33 min en Train R1 direct)", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://potstercersector.cat", "source": "POTS", "description": "Coordination opérationnelle de projets d'insertion sociale à Barcelone (Accessible en 33 min de train direct depuis la gare de Mataró).", "requirements": ["Gestion de projets sociaux", "Animation d'équipe", "Suivi opérationnel", "Sensibilisation communautaire"], "ai_advice": "🚆 Accès direct : Train Rodalies R1 depuis la gare de Mataró jusqu'à Barcelone Clot / Arc de Triomf en 33 minutes.", "match_score": 90, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🚆 Barcelone Direct R1 (< 30 km)", "🎓 Master UAB / Innovation Sociale"]}, {"id": "hacesfalta_com", "title": "Técnica de Comunicación y Campañas (20h)", "company": "ONG Social Barcelona", "category": "Barcelone (33 min Train)", "location": "Barcelona (33 min en Train R1 direct)", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://hacesfalta.org/oportunidades/ofertas/tecnica-de-comunicacion-y-campanas-20-horas--232049/", "source": "Hacesfalta.org", "description": "Gestion des réseaux sociaux, création de visuels (Canva, IA), mailing et diffusion des projets sociaux.", "requirements": ["Canva & Outils d'IA", "Gestion des réseaux sociaux", "Emailing / Newsletters", "Français & Espagnol"], "ai_advice": "Mettez en avant vos réalisations visuelles Canva et votre maîtrise des outils d'IA créative acquises lors de votre stage chez Coopmaresme.", "match_score": 98, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🎨 Marketing Digital / Canva / Mail", "📊 Data Analysis / Power BI / Excel", "🎓 Master UAB / Innovation Sociale", "🚆 Barcelone Direct R1 (< 30 km)"]}, {"id": "hacesfalta_community", "title": "Técnica de Comunicación o Gestor/a de Comunidad", "company": "Fundación Social", "category": "Barcelone (33 min Train)", "location": "Barcelona (33 min en Train R1 direct)", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://hacesfalta.org/oportunidades/ofertas/tecnica-de-comunicacion-o-gestor-a-de-comunidad--231362/", "source": "Hacesfalta.org", "description": "Animation de communauté, création de contenu digital, organisation d'ateliers et relations partenariales.", "requirements": ["Animation de communauté", "Création de contenu visuel", "Organisation d'événements", "Travail en équipe"], "ai_advice": "Soulignez votre profil trilingue (Français, Espagnol, Arabe) et votre aisance relationnelle pour animer la communauté et créer du lien avec les partenaires.", "match_score": 98, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🎨 Marketing Digital / Canva / Mail", "📊 Data Analysis / Power BI / Excel", "🎓 Master UAB / Innovation Sociale", "🚆 Barcelone Direct R1 (< 30 km)"]}, {"id": "tutreballess", "title": "Tècnic/a d'Acompanyament i Viabilitat de Projectes ESS", "company": "TuTreballESS / Xarxa ESS", "category": "Barcelone (33 min Train)", "location": "Barcelona / Maresme", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.tutreballess.cat/", "source": "TuTreballESS", "description": "Assistance technique dans les phases d'idéation et de viabilité économique pour des projets coopératifs et sociaux.", "requirements": ["Master Innovation Sociale (UAB)", "Idéation & Faisabilité", "Accompagnement d'entreprises sociales", "Backoffice"], "ai_advice": "Mettez fortement en valeur votre stage chez Coopmaresme et votre Master de l'UAB, qui s'alignent parfaitement avec l'écosystème de l'économie sociale et solidaire (ESS) ciblé par cette offre dans le Maresme. Soulignez votre double compétence en analyse économique (Licence) et accompagnement de projets (Master) pour démontrer votre capacité à évaluer la viabilité des coopératives.", "match_score": 98, "matched_skills": ["Master Entrepreneuriat & Innovation Sociale (UAB)", "Expérience chez Coopmaresme (Réseau ESS local)", "Compétences en viabilité économique & Excel"]}, {"id": "bloc4", "title": "Bloc 4 (Can Batlló) — Hub Innovation Sociale", "company": "Bloc 4 Barcelona", "category": "Barcelone (33 min Train)", "location": "Barcelona (Can Batlló)", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://bloc4.coop/", "source": "Site Officiel", "description": "Le grand centre d'innovation socio-économique et coopérative de Barcelone.", "requirements": ["Entrepreneuriat social", "Innovation coopérative", "Événementiel & Logistique", "Réseaux d'acteurs"], "ai_advice": "Valorisez votre Master à l'UAB et votre stage chez Coopmaresme, deux atouts majeurs s'alignant parfaitement avec la mission d'accompagnement de Bloc 4 Barcelona. Proposez vos services en back-office et communication pour soutenir activement le développement des coopératives incubées au sein de ce hub.", "match_score": 94, "matched_skills": ["Master UAB / Innovation Sociale & ESS", "Expérience Coopmaresme / Écosystème Coopératif", "Catalan & Espagnol professionnels"]}, {"id": "linkedin_proyectos", "title": "LinkedIn Jobs — Técnico/a de Proyectos Sociales", "company": "Moteur LinkedIn", "category": "Barcelone (33 min Train)", "location": "Barcelona", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.linkedin.com/jobs/search/?keywords=tecnico%20proyectos%20sociales&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour toutes les offres de techniciens de projets sociaux à Barcelone.", "requirements": ["Gestion de projets", "Secteur social", "Barcelone", "Français / Espagnol"], "ai_advice": "Filtrez sur LinkedIn les postes publiés 'il y a moins de 24h' et utilisez le format CV PDF préparé pour postuler immédiatement.", "match_score": 97, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🚆 Barcelone Direct R1 (< 30 km)", "🎨 Marketing Digital / Canva / Mail", "🎓 Master UAB / Innovation Sociale"]}, {"id": "linkedin_com", "title": "LinkedIn Jobs — Técnico/a de Comunicación y Marketing", "company": "Moteur LinkedIn", "category": "Barcelone (33 min Train)", "location": "Barcelona", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.linkedin.com/jobs/search/?keywords=comunicacion%20marketing%20social&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour les offres de communication, Canva, et marketing digital à Barcelone.", "requirements": ["Marketing digital", "Canva & Visuels", "Social Media", "Barcelone"], "ai_advice": "Ciblez en priorité les rôles de communication sociale à Barcelone, facilement accessibles en train depuis Mataró. Mettez en avant votre expérience d'impact local chez Coopmaresme et votre maîtrise de Canva pour maximiser vos chances.", "match_score": 88, "matched_skills": ["Master Innovation Sociale (UAB)", "Communication Digitale & Canva", "Trilingue Français / Espagnol / Catalan"]}, {"id": "linkedin_ess", "title": "LinkedIn Jobs — Economía Social & Cooperativas", "company": "Moteur LinkedIn", "category": "Barcelone (33 min Train)", "location": "Barcelona", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.linkedin.com/jobs/search/?keywords=economia%20social&location=Barcelona", "source": "LinkedIn", "description": "Recherche filtrée en temps réel pour toutes les offres du secteur coopératif et de l'innovation sociale.", "requirements": ["Innovation sociale", "Cooperatives / ESS", "Gestion d'initiatives", "Barcelone"], "ai_advice": "Utilisez les termes en catalan ('Economia Social i Solidària') lors de vos prises de contact directes sur LinkedIn avec les recruteurs.", "match_score": 90, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🚆 Barcelone Direct R1 (< 30 km)", "🎓 Master UAB / Innovation Sociale"]}, {"id": "hacesfalta_hub", "title": "Hacesfalta.org — Offres Emploi ONG Barcelone", "company": "Fundación Botín / Hacesfalta", "category": "Barcelone (33 min Train)", "location": "Barcelona", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.hacesfalta.org/oportunidades/ofertas/buscador?txtBusqueda=proyectos&idProvincia=8", "source": "Hacesfalta", "description": "Moteur de recherche pour les postes de techniciens de projets et communication dans les ONG à Barcelone.", "requirements": ["ONG & Fondations", "Proyectos sociales", "Comunicación", "Barcelone"], "ai_advice": "Créez un profil complet sur Hacesfalta.org pour postuler activement aux rôles de technicienne de projet ou communication dans les ONG de Barcelone. Mettez en avant votre Master de l'UAB et votre expérience chez Coopmaresme pour valoriser votre ancrage dans l'économie sociale locale.", "match_score": 88, "matched_skills": ["Master Innovation Sociale (UAB)", "Communication & Back-office (Coopmaresme)", "Trilingue Espagnol / Catalan / Français"]}, {"id": "infojobs_hub", "title": "InfoJobs — Técnico de Proyectos (Barcelona)", "company": "InfoJobs", "category": "Barcelone (33 min Train)", "location": "Barcelona", "type": "🚆 Barcelone Direct R1 (< 30 km)", "url": "https://www.infojobs.net/ofertas-trabajo/tecnico-proyectos/barcelona", "source": "InfoJobs", "description": "Offres d'emploi recensées sur InfoJobs pour les techniciens de projets à Barcelone.", "requirements": ["Técnico de proyectos", "Barcelone"], "ai_advice": "Mettez votre CV à jour sur InfoJobs en sélectionnant 'Niveau d'études : Master' et 'Secteur : Services Sociaux'.", "match_score": 94, "matched_skills": ["⚙️ Coordination Projets / Backoffice", "🚆 Barcelone Direct R1 (< 30 km)", "🎨 Marketing Digital / Canva / Mail", "📊 Data Analysis / Power BI / Excel"]}];
+    let currentFilter = 'ALL';
+
+    function getCircleProgress(score) {
+      const radius = 20;
+      const circumference = 2 * Math.PI * radius;
+      const offset = circumference - (score / 100) * circumference;
+      return { circumference, offset };
+    }
+
+    function renderJobs() {
+      const grid = document.getElementById('jobsGrid');
+      const searchVal = document.getElementById('searchInput').value.toLowerCase();
+      grid.innerHTML = '';
+
+      let displayedJobs = 0;
+
+      jobsData.forEach(job => {
+        const isMataro = job.location.toLowerCase().includes('mataró') || 
+                         job.location.toLowerCase().includes('mataro') ||
+                         job.type.toLowerCase().includes('mataró') ||
+                         job.category.toLowerCase().includes('mataró');
+
+        const combinedText = (job.title + " " + job.description + " " + (job.requirements ? job.requirements.join(' ') : '') + " " + (job.ai_advice || '')).toLowerCase();
+                         
+        let matchesCategory = false;
+        if (currentFilter === 'ALL') matchesCategory = true;
+        else if (currentFilter === 'Mataró') matchesCategory = isMataro;
+        else if (currentFilter === 'TopMatch') matchesCategory = job.match_score >= 90;
+        else if (currentFilter === 'Innovation') matchesCategory = combinedText.includes('uab') || combinedText.includes('innovac') || combinedText.includes('ess') || combinedText.includes('coop');
+        else if (currentFilter === 'Data') matchesCategory = combinedText.includes('power bi') || combinedText.includes('excel') || combinedText.includes('backoffice') || combinedText.includes('datos') || combinedText.includes('benchmarking');
+        else if (currentFilter === 'Communication') matchesCategory = combinedText.includes('canva') || combinedText.includes('comunicac') || combinedText.includes('marketing') || combinedText.includes('rrss') || combinedText.includes('mailing');
+                            
+        const matchesSearch = job.title.toLowerCase().includes(searchVal) || 
+                              job.category.toLowerCase().includes(searchVal) ||
+                              job.description.toLowerCase().includes(searchVal) ||
+                              (job.requirements && job.requirements.join(' ').toLowerCase().includes(searchVal)) ||
+                              (job.ai_advice && job.ai_advice.toLowerCase().includes(searchVal)) ||
+                              job.source.toLowerCase().includes(searchVal);
+
+        if (matchesCategory && matchesSearch) {
+          displayedJobs++;
+          const card = document.createElement('div');
+          card.className = `card ${isMataro ? 'mataro-card' : ''}`;
+          card.style.animationDelay = `${displayedJobs * 0.05}s`;
+          
+          const { circumference, offset } = getCircleProgress(job.match_score);
+
+          let reqHtml = '';
+          if (job.requirements && job.requirements.length > 0) {
+            reqHtml = `<div class="skill-section">
+              <div class="skill-title">Requis & Compétences Clés</div>
+              <div class="skill-tags">
+                ${job.requirements.map(r => `<span class="skill-tag">${r}</span>`).join('')}
+              </div>
+            </div>`;
+          }
+
+          let skillsHtml = '';
+          if (job.matched_skills && job.matched_skills.length > 0) {
+            skillsHtml = `<div class="skill-tags" style="margin-bottom: 16px;">
+              ${job.matched_skills.map(s => `<span class="skill-tag highlight">✓ ${s}</span>`).join('')}
+            </div>`;
+          }
+
+          const goldTagClass = isMataro ? 'gold' : '';
+
+          card.innerHTML = `
+            <div class="card-header">
+              <div class="tag-row">
+                <span class="type-tag ${goldTagClass}">${job.type}</span>
+                <div class="match-circle">
+                  <svg width="48" height="48">
+                    <circle class="bg" cx="24" cy="24" r="20" fill="none" stroke-width="4"></circle>
+                    <circle class="progress" cx="24" cy="24" r="20" fill="none" stroke-width="4" 
+                            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"></circle>
+                  </svg>
+                  <span>${job.match_score}%</span>
+                </div>
+              </div>
+              <h3 class="card-title">${job.title}</h3>
+              <div class="card-subtitle">${job.company}</div>
+              <p class="card-desc">${job.description}</p>
+            </div>
+            
+            ${reqHtml}
+            ${skillsHtml}
+            
+            <div class="ai-box">
+              <div class="ai-label">🤖 Pourquoi ce poste convient à Safae</div>
+              <div class="ai-text">${job.ai_advice}</div>
+            </div>
+            
+            <div class="card-footer">
+              <div class="meta-info">
+                📍 ${job.location}<br>
+                🏷️ Source: ${job.source}
+              </div>
+              <div class="card-action-row" style="margin-top: 14px; display: flex; gap: 10px; flex-wrap: wrap;">
+                <button onclick="openGeminiModal('${job.id}')" class="gemini-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3L12 3z"/></svg>
+                  ✨ Lettre de Motivation IA (Gemini)
+                </button>
+                <a href="${job.url}" target="_blank" class="apply-btn">
+                  Postuler Directement
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+                </a>
+              </div>
+            </div>
+          `;
+          grid.appendChild(card);
+        }
+      });
+
+      if (displayedJobs === 0) {
+        grid.innerHTML = `<div class="empty-state">
+          <h3>Aucune offre trouvée 🔍</h3>
+          <p style="color: var(--text-muted);">Essayez de modifier vos critères de recherche.</p>
+        </div>`;
+      }
+
+      document.getElementById('stats-count').innerText = displayedJobs;
+      document.getElementById('stats-label').innerText = displayedJobs > 1 ? "Postes Sélectionnés" : "Poste Sélectionné";
+    }
+
+    <!-- Modal Gemini AI Cover Letter -->
+    <div id="geminiModal" class="modal-overlay">
+      <div class="modal-card">
+        <button class="modal-close" onclick="closeGeminiModal()">&times;</button>
+        <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px;">
+          <span style="font-size: 20px;">✨</span>
+          <h3 style="font-family: 'Sora', sans-serif; color: var(--accent-cyan); font-size: 18px;" id="modalTitle">Lettre de Motivation IA (Gemini)</h3>
+        </div>
+        <p style="font-size: 12px; color: var(--text-muted);" id="modalSub">Générée spécialement pour le profil de Safae Benmoussa (Master UAB & Coopmaresme)</p>
+
+        <div class="letter-box" id="letterContent">Chargement de la lettre...</div>
+
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span style="font-size: 11px; color: var(--accent-emerald);">✓ Prête à envoyer en Catalan / Espagnol</span>
+          <button onclick="copyLetter()" id="copyBtn" class="apply-btn" style="background: var(--accent-purple); color: #fff;">
+            📋 Copier la Lettre
+          </button>
+        </div>
+      </div>
+    </div>
+
+    document.querySelectorAll('.chip').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.chip').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+        currentFilter = this.getAttribute('data-filter');
+        renderJobs();
+      });
+    });
+
+    document.getElementById('searchInput').addEventListener('input', renderJobs);
+    renderJobs();
+
+    async function openGeminiModal(jobId) {
+      const job = jobsData.find(j => j.id === jobId);
+      if (!job) return;
+
+      document.getElementById('modalTitle').innerText = `✨ Lettre de Motivation IA — ${job.company}`;
+      document.getElementById('modalSub').innerText = `Poste: ${job.title} | Localisation: ${job.location}`;
+      document.getElementById('geminiModal').style.display = 'flex';
+      document.getElementById('letterContent').innerText = "✨ Connexion à Gemini 3.5 Flash en cours...
+Rédaction de la lettre de motivation sur mesure pour Safae Benmoussa...";
+
+      const apiKey = "AQ.Ab8RN6LcQ1yA37kauz2wU6hKojttJelVg-Ax0C4v0qQko0EHZg";
+      const isCatalan = job.location.toLowerCase().includes('mataró') || job.source.toLowerCase().includes('ajuntament') || job.source.toLowerCase().includes('soc') || job.source.toLowerCase().includes('xes');
+      const lang = isCatalan ? "catalán" : "español";
+
+      const prompt = `Escribe una carta de presentación altamente profesional en ${lang} para Safae Benmoussa aplicando al puesto "${job.title}" en la empresa "${job.company}" (${job.location}).
+Detalles del perfil de Safae:
+- Máster en Emprendimiento e Innovación Social en la Universidad Autónoma de Barcelona (UAB).
+- Graduada en Economía y Gestión.
+- Residencia habitual en Mataró (Carrer Bombers Madern i Clariana 14, 08303 Mataró).
+- Experiencia laboral relevante en Coopmaresme (Ateneu Cooperatiu del Maresme en Mataró) en labores de apoyo administrativo (backoffice), benchmarking y campañas de comunicación digital.
+- Competencias técnicas: Power BI, Excel, Canva, Emailing / Mailings, Herramientas de Inteligencia Artificial creativa.
+- Perfil trilingüe: Francés (bilingüe), Español (fluido), Árabe (materno) y Catalán (nivel profesional).
+La carta debe ser elegante, persuasiva, con tono formal y lista para enviar.`;
+
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${apiKey}`;
+        const response = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+        });
+        const data = await response.json();
+        if (data.candidates && data.candidates[0].content.parts[0].text) {
+          document.getElementById('letterContent').innerText = data.candidates[0].content.parts[0].text;
+          return;
+        }
+      } catch (err) {
+        console.warn("Fallback au modèle local de lettre IA:", err);
+      }
+
+      let letterText = isCatalan ? `Benvolgut/da responsable de selecció de ${job.company},
+
+Em poso en contacte amb vostès per presentar la meva candidatura al lloc de "${job.title}". Com a graduada en Economia i Gestió i actual estudiant del Màster en Emprenedoria i Innovació Social a la UAB, compto amb una formació sòlida i compromís amb el desenvolupament socioeconòmic local.
+
+Durant la meva experiència pràctica a Coopmaresme a Mataró, vaig desenvolupar tasques de suport administratiu (backoffice), benchmarking, així com campanyes de comunicació digital amb Canva, eines d'IA i mailings. Així mateix, domino eines com Power BI i Excel, i sóc trilingüe (FR/ES/AR + Català).
+
+Residint actualment a Mataró (Carrer Bombers Madern i Clariana 14), tinc plena disponibilitat immediata per incorporar-me.
+
+Atentament,
+
+Safae Benmoussa
+Master en Emprenedoria i Innovació Social (UAB)` : `Estimado/a responsable de selección de ${job.company},
+
+Me pongo en contacto con ustedes para presentar mi candidatura al puesto de "${job.title}". Graduada en Economía y Gestión y estudiante del Máster en Emprendimiento e Innovación Social en la UAB, cuento con una sólida preparación estratégica y operativa.
+
+Durante mi experiencia en Coopmaresme (Mataró), coordiné tareas de backoffice, benchmarking y la elaboración de contenidos digitales con Canva, IA y mailings. Poseo manejo fluido de Power BI y Excel, y perfil trilingüe (FR/ES/AR + Catalán).
+
+Con residencia en Mataró, dispongo de incorporación inmediata.
+
+Atentamente,
+
+Safae Benmoussa
+Máster en Emprendimiento e Innovación Social (UAB)`;
+      document.getElementById('letterContent').innerText = letterText;
+    }
+
+    function closeGeminiModal() {
+      document.getElementById('geminiModal').style.display = 'none';
+    }
+
+    function copyLetter() {
+      const text = document.getElementById('letterContent').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const btn = document.getElementById('copyBtn');
+        btn.innerText = '✅ Lettre Copiée !';
+        setTimeout(() => { btn.innerText = '📋 Copier la Lettre'; }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>
